@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { getTodos, addTodo, deleteTodo } from './api/todos';
+import { getTodos, addTodo, deleteTodo, patchTodo } from './api/todos';
 import { TodoList } from './components/TodoList';
 import { TodoHeader } from './components/TodoHeader';
 import { Todo } from './types/Todo';
@@ -63,6 +63,26 @@ export const App: React.FC = () => {
     }
   };
 
+  const handlePatch = async (id: number, newTitle: string) => {
+    try {
+      setLoadingTodos(prev => [...prev, id]);
+
+      const updatedTodo = await patchTodo(id, { title: newTitle });
+
+      setTodos(prevTodos =>
+        prevTodos.map(todo =>
+          todo.id === id ? { ...todo, title: updatedTodo.title } : todo,
+        ),
+      );
+    } catch {
+      if (!isLoading) {
+        setError('Unable to update a todo');
+      }
+    } finally {
+      setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
+    }
+  };
+
   const handleDelete = async (id: number) => {
     setLoadingTodos(prev => [...prev, id]);
     try {
@@ -78,6 +98,8 @@ export const App: React.FC = () => {
 
   const handleToggle = async (id: number) => {
     const todoToUpdate = todos.find(todo => todo.id === id);
+
+    setIsLoading(true);
 
     if (!todoToUpdate) {
       return;
@@ -96,6 +118,7 @@ export const App: React.FC = () => {
       setError('Unable to update todo');
     } finally {
       setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
+      setIsLoading(false);
     }
   };
 
@@ -188,6 +211,7 @@ export const App: React.FC = () => {
           handleDelete={handleDelete}
           loadingTodos={loadingTodos}
           tempTodo={tempTodo}
+          handlePatch={handlePatch}
         />
 
         <TodoFooter
@@ -198,20 +222,18 @@ export const App: React.FC = () => {
         />
       </div>
 
-      {error && (
-        <div
-          data-cy="ErrorNotification"
-          className="notification is-danger is-light has-text-weight-normal"
-        >
-          <button
-            data-cy="HideErrorButton"
-            type="button"
-            className="delete"
-            onClick={() => setError('')}
-          />
-          {error}
-        </div>
-      )}
+      <div
+        data-cy="ErrorNotification"
+        className={`notification is-danger is-light has-text-weight-normal ${error ? '' : 'hidden'}`}
+      >
+        <button
+          data-cy="HideErrorButton"
+          type="button"
+          className="delete"
+          onClick={() => setError('')}
+        />
+        {error}
+      </div>
     </div>
   );
 };

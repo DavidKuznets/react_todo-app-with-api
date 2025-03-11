@@ -1,10 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import React, { useState, useEffect, useRef } from 'react';
 import { Todo } from '../types/Todo';
 
 interface PropsTodoItem {
   todo: Todo;
   handleToggle: (id: number) => void;
   handleDelete: (id: number) => Promise<void>;
+  handlePatch: (id: number, newTitle: string) => Promise<void>;
   loadingTodos: number[];
 }
 
@@ -12,8 +14,60 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   todo,
   handleToggle,
   handleDelete,
+  handlePatch,
   loadingTodos,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(todo.title);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+    }
+  }, [isEditing]);
+
+  const startEditing = () => {
+    setIsEditing(true);
+  };
+
+  const saveTitle = async () => {
+    const trimmedTitle = title.trim();
+
+    if (trimmedTitle === todo.title) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    if (!trimmedTitle) {
+      await handleDelete(todo.id);
+
+      return;
+    }
+
+    try {
+      await handlePatch(todo.id, trimmedTitle);
+    } catch {
+      alert('Unable to update a todo');
+    }
+
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = async (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === 'Enter') {
+      await saveTitle();
+    }
+
+    if (event.key === 'Escape') {
+      setTitle(todo.title);
+      setIsEditing(false);
+    }
+  };
+
   return (
     <div data-cy="Todo" className={`todo ${todo.completed ? 'completed' : ''}`}>
       <label className="todo__status-label">
@@ -23,12 +77,29 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
           className="todo__status"
           checked={todo.completed}
           onChange={() => handleToggle(todo.id)}
+          disabled={loadingTodos.includes(todo.id)}
         />
       </label>
 
-      <span data-cy="TodoTitle" className="todo__title">
-        {todo.title}
-      </span>
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          className="todo__title-input"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          onBlur={saveTitle}
+          onKeyDown={handleKeyDown}
+        />
+      ) : (
+        <span
+          data-cy="TodoTitle"
+          className="todo__title"
+          onDoubleClick={startEditing}
+        >
+          {todo.title}
+        </span>
+      )}
 
       <button
         type="button"

@@ -10,6 +10,7 @@ interface Props {
   handleDelete: (id: number) => Promise<void>;
   loadingTodos: number[];
   tempTodo: Todo | null;
+  handlePatch: (id: number, newTitle: string) => Promise<void>;
 }
 
 export const TodoList: React.FC<Props> = ({
@@ -19,6 +20,7 @@ export const TodoList: React.FC<Props> = ({
   handleDelete,
   loadingTodos,
   tempTodo,
+  handlePatch,
 }) => {
   if (filteredTodos.length === 0 && !isLoading) {
     return null;
@@ -32,6 +34,7 @@ export const TodoList: React.FC<Props> = ({
           todo={todo}
           handleToggle={handleToggle}
           handleDelete={handleDelete}
+          handlePatch={handlePatch}
           loadingTodos={loadingTodos}
         />
       ))}
