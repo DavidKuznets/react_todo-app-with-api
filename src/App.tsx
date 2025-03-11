@@ -66,7 +66,6 @@ export const App: React.FC = () => {
   const handlePatch = async (id: number, newTitle: string) => {
     try {
       setLoadingTodos(prev => [...prev, id]);
-
       const updatedTodo = await patchTodo(id, { title: newTitle });
 
       setTodos(prevTodos =>
@@ -109,13 +108,16 @@ export const App: React.FC = () => {
 
     try {
       setLoadingTodos(prev => [...prev, id]);
+
+      await patchTodo(id, { completed: newStatus });
+
       setTodos(prevTodos =>
         prevTodos.map(todo =>
           todo.id === id ? { ...todo, completed: newStatus } : todo,
         ),
       );
     } catch {
-      setError('Unable to update todo');
+      setError('Unable to update a todo');
     } finally {
       setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
       setIsLoading(false);
@@ -127,7 +129,19 @@ export const App: React.FC = () => {
     const newStatus = !allCompleted;
 
     try {
-      setTodos(todos.map(todo => ({ ...todo, completed: newStatus })));
+      const todosToUpdate = todos.filter(todo => todo.completed !== newStatus);
+
+      await Promise.all(
+        todosToUpdate.map(todo => patchTodo(todo.id, { completed: newStatus })),
+      );
+
+      setTodos(
+        todos.map(todo =>
+          todosToUpdate.includes(todo)
+            ? { ...todo, completed: newStatus }
+            : todo,
+        ),
+      );
     } catch {
       setError('Unable to toggle all todos');
     }

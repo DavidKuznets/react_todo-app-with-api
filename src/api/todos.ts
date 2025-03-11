@@ -18,7 +18,7 @@ export const addTodo = (newTodo: { title: string; completed: boolean }) => {
 };
 
 export const patchTodo = (id: number, updatedFields: Partial<Todo>) => {
-  console.log('Patch request for Todo ID:', id, updatedFields);
+  // console.log('Patch request for Todo ID:', id, updatedFields);
 
   return client.patch<Todo>(`/todos/${id}`, updatedFields);
 };
