@@ -20,6 +20,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(todo.title);
   const [isSaving, setIsSaving] = useState(false);
+  const [initialTitle, setInitialTitle] = useState(todo.title);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
 
   const startEditing = () => {
     setIsEditing(true);
+    setInitialTitle(todo.title);
   };
 
   const saveTitle = async () => {
@@ -57,14 +59,14 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
     }
 
     if (event.key === 'Escape') {
-      setTitle(todo.title);
+      setTitle(initialTitle);
       setIsEditing(false);
       event.preventDefault();
     }
   };
 
   const handleBlur = () => {
-    if (title.trim() !== todo.title && isEditing) {
+    if (!isSaving && title.trim() !== todo.title && isEditing) {
       saveTitle();
     } else {
       setIsEditing(false);
