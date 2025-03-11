@@ -90,7 +90,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
         <input
           ref={inputRef}
           type="text"
-          className="todo__title-input"
+          className="todo__title-field"
           value={title}
           onChange={e => setTitle(e.target.value)}
           onBlur={handleBlur}
