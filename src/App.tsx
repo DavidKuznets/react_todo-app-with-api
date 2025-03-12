@@ -70,7 +70,7 @@ export const App: React.FC = () => {
     }
   };
 
-  const handlePatch = async (id: number, newTitle: string) => {
+  const handlePatch = async (id: number, newTitle: string): Promise<Todo> => {
     try {
       setLoadingTodos(prev => [...prev, id]);
       const updatedTodo = await patchTodo(id, { title: newTitle });
@@ -80,10 +80,14 @@ export const App: React.FC = () => {
           todo.id === id ? { ...todo, title: updatedTodo.title } : todo,
         ),
       );
-    } catch {
+
+      return updatedTodo;
+    } catch (e) {
       if (!isLoading) {
         setError('Unable to update a todo');
       }
+
+      throw e;
     } finally {
       setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
     }

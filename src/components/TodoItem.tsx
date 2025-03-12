@@ -6,7 +6,7 @@ interface PropsTodoItem {
   todo: Todo;
   handleToggle: (id: number) => void;
   handleDelete: (id: number) => Promise<void>;
-  handlePatch: (id: number, newTitle: string) => Promise<void>;
+  handlePatch: (id: number, newTitle: string) => Promise<Todo>;
   loadingTodos: number[];
 }
 

@@ -10,7 +10,7 @@ interface Props {
   handleDelete: (id: number) => Promise<void>;
   loadingTodos: number[];
   tempTodo: Todo | null;
-  handlePatch: (id: number, newTitle: string) => Promise<void>;
+  handlePatch: (id: number, newTitle: string) => Promise<Todo>;
 }
 
 export const TodoList: React.FC<Props> = ({
