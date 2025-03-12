@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
+import classNames from 'classnames';
 import { Todo } from '../types/Todo';
 import { FilterType } from '../types/enum';
 
@@ -24,32 +25,23 @@ export const TodoFooter: React.FC<PropsFooter> = ({
           <span className="todo-count" data-cy="TodosCounter">
             {todos.filter(todo => !todo.completed).length} items left
           </span>
+
           <nav className="filter" data-cy="Filter">
-            <a
-              href="#/"
-              className={`filter__link ${filter === FilterType.All ? 'selected' : ''}`}
-              data-cy="FilterLinkAll"
-              onClick={() => setFilter(FilterType.All)}
-            >
-              All
-            </a>
-            <a
-              href="#/active"
-              className={`filter__link ${filter === FilterType.Active ? 'selected' : ''}`}
-              data-cy="FilterLinkActive"
-              onClick={() => setFilter(FilterType.Active)}
-            >
-              Active
-            </a>
-            <a
-              href="#/completed"
-              className={`filter__link ${filter === FilterType.Completed ? 'selected' : ''}`}
-              data-cy="FilterLinkCompleted"
-              onClick={() => setFilter(FilterType.Completed)}
-            >
-              Completed
-            </a>
+            {Object.values(FilterType).map(type => (
+              <a
+                key={type}
+                href={`#/${type.toLowerCase()}`}
+                className={classNames('filter__link', {
+                  selected: filter === type,
+                })}
+                data-cy={`FilterLink${type.charAt(0).toUpperCase() + type.slice(1)}`}
+                onClick={() => setFilter(type)}
+              >
+                {type}
+              </a>
+            ))}
           </nav>
+
           <button
             type="button"
             className="todoapp__clear-completed"

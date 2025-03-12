@@ -21,15 +21,14 @@ export const App: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filteredTodos = todos.filter(todo => {
-    if (filter === 'active') {
-      return !todo.completed;
+    switch (filter) {
+      case FilterType.Active:
+        return !todo.completed;
+      case FilterType.Completed:
+        return todo.completed;
+      default:
+        return true;
     }
-
-    if (filter === 'completed') {
-      return todo.completed;
-    }
-
-    return true;
   });
 
   const handleAdd = async (event: React.FormEvent) => {
@@ -42,7 +41,15 @@ export const App: React.FC = () => {
       return;
     }
 
-    setTempTodo({ id: 0, userId: 1, title: trimmedTitle, completed: false });
+    const tempId = Date.now();
+    const newTempTodo = {
+      id: tempId,
+      userId: 1,
+      title: trimmedTitle,
+      completed: false,
+    };
+
+    setTempTodo(newTempTodo);
     setIsLoading(true);
 
     try {
@@ -51,7 +58,7 @@ export const App: React.FC = () => {
         completed: false,
       });
 
-      setTodos([...todos, savedTodo]);
+      setTodos(prevTodos => [...prevTodos, savedTodo]);
       setNewTodo('');
       setTempTodo(null);
     } catch {

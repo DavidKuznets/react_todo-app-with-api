@@ -59,7 +59,10 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
     }
 
     if (event.key === 'Escape') {
-      setTitle(initialTitle);
+      if (title.trim() !== initialTitle) {
+        setTitle(initialTitle);
+      }
+
       setIsEditing(false);
       event.preventDefault();
     }
