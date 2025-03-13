@@ -42,7 +42,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
 
     setIsSaving(true);
 
-    const resp = await handlePatch(todo.id, title.trim());
+    const resp = await handlePatch(todo.id, title.trim()).catch(console.log);
 
     if (resp) {
       setIsSaving(false);
@@ -55,8 +55,6 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   const handleKeyDown = async (
     event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
-    event.preventDefault();
-
     if (event.key === 'Enter') {
       await saveTitle();
     }
@@ -65,7 +63,6 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
       isCancelledRef.current = true;
       setTitle(initialTitle);
       setIsEditing(false);
-      event.preventDefault();
     }
   };
 
@@ -106,7 +103,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
           value={title}
           onChange={e => setTitle(e.target.value)}
           onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyDown}
           data-cy="TodoTitleField"
         />
       ) : (
