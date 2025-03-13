@@ -55,6 +55,8 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   const handleKeyDown = async (
     event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
+    event.preventDefault();
+
     if (event.key === 'Enter') {
       await saveTitle();
     }
@@ -67,7 +69,9 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
     }
   };
 
-  const handleBlur = () => {
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+    event.preventDefault();
+
     if (isCancelledRef.current) {
       isCancelledRef.current = false;
 
