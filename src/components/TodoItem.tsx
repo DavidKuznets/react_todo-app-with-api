@@ -22,6 +22,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [initialTitle, setInitialTitle] = useState(todo.title);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isCancelledRef = useRef(false);
 
   useEffect(() => {
     if (isEditing) {
@@ -50,8 +51,6 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
       alert('Unable to update a todo');
     }
   };
-
-  const isCancelledRef = useRef(false);
 
   const handleKeyDown = async (
     event: React.KeyboardEvent<HTMLInputElement>,
@@ -112,9 +111,10 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
           className="todo__title"
           onDoubleClick={startEditing}
         >
-          {todo.title}
+          {title}
         </span>
       )}
+
       {!isEditing && (
         <button
           type="button"
