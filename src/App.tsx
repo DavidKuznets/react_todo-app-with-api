@@ -5,6 +5,7 @@ import { TodoHeader } from './components/TodoHeader';
 import { Todo } from './types/Todo';
 import { FilterType } from './types/enum';
 import { TodoFooter } from './components/TodoFooter';
+import classNames from 'classnames';
 import './styles/index.scss';
 import './styles/todoapp.scss';
 import './styles/filter.scss';
@@ -87,7 +88,7 @@ export const App: React.FC = () => {
         setError('Unable to update a todo');
       }
 
-      throw e;
+      throw new Error('Update failed');
     } finally {
       setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
     }
@@ -249,7 +250,10 @@ export const App: React.FC = () => {
 
       <div
         data-cy="ErrorNotification"
-        className={`notification is-danger is-light has-text-weight-normal ${error ? '' : 'hidden'}`}
+        className={classNames(
+          'notification is-danger is-light has-text-weight-normal',
+          { hidden: !error },
+        )}
       >
         <button
           data-cy="HideErrorButton"

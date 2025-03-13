@@ -6,7 +6,7 @@ interface PropsTodoItem {
   todo: Todo;
   handleToggle: (id: number) => void;
   handleDelete: (id: number) => Promise<void>;
-  handlePatch: (id: number, newTitle: string) => Promise<Todo>;
+  handlePatch: (id: number, newTitle: string) => Promise<Todo | null>;
   loadingTodos: number[];
 }
 
@@ -41,15 +41,17 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
 
     setIsSaving(true);
 
-    try {
-      await handlePatch(todo.id, title.trim());
-    } catch {
-      alert('Unable to update a todo');
-    } finally {
+    const resp = await handlePatch(todo.id, title.trim());
+
+    if (resp) {
       setIsSaving(false);
       setIsEditing(false);
+    } else {
+      alert('Unable to update a todo');
     }
   };
+
+  const isCancelledRef = useRef(false);
 
   const handleKeyDown = async (
     event: React.KeyboardEvent<HTMLInputElement>,
@@ -59,16 +61,20 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
     }
 
     if (event.key === 'Escape') {
-      if (title.trim() !== initialTitle) {
-        setTitle(initialTitle);
-      }
-
+      isCancelledRef.current = true;
+      setTitle(initialTitle);
       setIsEditing(false);
       event.preventDefault();
     }
   };
 
   const handleBlur = () => {
+    if (isCancelledRef.current) {
+      isCancelledRef.current = false;
+
+      return;
+    }
+
     if (!isSaving && title.trim() !== todo.title && isEditing) {
       saveTitle();
     } else {
