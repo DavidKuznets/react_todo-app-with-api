@@ -36,13 +36,21 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
   };
 
   const saveTitle = async () => {
-    if (isSaving || title.trim() === todo.title) {
+    if (isSaving) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      handleDelete(todo.id);
+
       return;
     }
 
     setIsSaving(true);
 
-    const resp = await handlePatch(todo.id, title.trim()).catch(console.log);
+    const resp = await handlePatch(todo.id, trimmedTitle);
 
     if (resp) {
       setIsSaving(false);
@@ -63,6 +71,10 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
       isCancelledRef.current = true;
       setTitle(initialTitle);
       setIsEditing(false);
+
+      if (isSaving || title.trim() === todo.title) {
+        return;
+      }
     }
   };
 

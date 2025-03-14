@@ -110,17 +110,15 @@ export const App: React.FC = () => {
   const handleToggle = async (id: number) => {
     const todoToUpdate = todos.find(todo => todo.id === id);
 
-    setIsLoading(true);
-
     if (!todoToUpdate) {
       return;
     }
 
     const newStatus = !todoToUpdate.completed;
 
-    try {
-      setLoadingTodos(prev => [...prev, id]);
+    setLoadingTodos(prev => [...prev, id]);
 
+    try {
       await patchTodo(id, { completed: newStatus });
 
       setTodos(prevTodos =>
@@ -132,17 +130,17 @@ export const App: React.FC = () => {
       setError('Unable to update a todo');
     } finally {
       setLoadingTodos(prev => prev.filter(todoId => todoId !== id));
-      setIsLoading(false);
     }
   };
 
   const handleToggleAll = async () => {
     const allCompleted = todos.every(todo => todo.completed);
     const newStatus = !allCompleted;
+    const todosToUpdate = todos.filter(todo => todo.completed !== newStatus);
+
+    setLoadingTodos(prev => [...prev, ...todosToUpdate.map(todo => todo.id)]);
 
     try {
-      const todosToUpdate = todos.filter(todo => todo.completed !== newStatus);
-
       await Promise.all(
         todosToUpdate.map(todo => patchTodo(todo.id, { completed: newStatus })),
       );
@@ -156,6 +154,10 @@ export const App: React.FC = () => {
       );
     } catch {
       setError('Unable to toggle all todos');
+    } finally {
+      setLoadingTodos(prev =>
+        prev.filter(id => !todosToUpdate.some(todo => todo.id === id)),
+      );
     }
   };
 
