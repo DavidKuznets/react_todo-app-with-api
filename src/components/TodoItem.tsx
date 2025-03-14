@@ -43,7 +43,7 @@ export const TodoItem: React.FC<PropsTodoItem> = ({
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
-      handleDelete(todo.id);
+      await handleDelete(todo.id);
 
       return;
     }
